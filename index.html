@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handige Media Player</title>
+
+<script src="https://unpkg.com/wavesurfer.js"></script>
+
+<style>
+:root {
+  --bg-color: #0d1117;
+  --card-bg: #161b22;
+  --panel-bg: #21262d;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --green: #22c55e;
+  --red: #ef4444;
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --border: #30363d;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.box {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+h2 {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.timebar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wave-wrap {
+  position: relative;
+  padding: 8px 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#waveform {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#loopZone {
+  position: absolute;
+  top: 8px;
+  height: 80px;
+  background: rgba(59, 130, 246, 0.25);
+  border-left: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  display: none;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#abMarkers .marker {
+  position: absolute;
+  transform: translateX(-50%);
+  bottom: 0px;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+#markA { background: var(--green); color: white; }
+#markB { background: var(--red); color: white; }
+
+.chapter-box {
+  margin-top: 16px;
+  background: var(--panel-bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+
+.chapter-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.chapter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chapter {
+  background: #30363d;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.chapter:hover {
+  background: #3c444d;
+}
+
+.chapter.active {
+  background: var(--green);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.controls-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.controls-row button {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.controls-row button:hover {
+  background: #2d333b;
+  border-color: #444c56;
+}
+
+.controls-row button:active {
+  transform: scale(0.98);
+}
+
+#playBtn {
+  background: var(--accent);
+  border-color: var(--accent);
+  flex: 1.2;
+}
+
+#playBtn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.speed {
+  margin-top: 16px;
+  background: var(--panel-bg);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.speed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.speed-controls-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#speedVal {
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  min-width: 42px;
+  text-align: right;
+}
+
+.btn-reset {
+  background: #30363d;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.btn-reset:hover {
+  background: #3c444d;
+}
+
+.speed input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.playlist-container {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+.playlist-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.track {
+  padding: 12px 14px;
+  background: var(--panel-bg);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.track:hover {
+  border-color: var(--border);
+  background: #282e36;
+}
+
+.track.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>🎧 MP3 Player</h2>
+
+  <div class="timebar">
+    <span id="currentTime">0:00</span>
+    <span id="totalTime">0:00</span>
+  </div>
+
+  <div class="wave-wrap">
+    <div id="waveform"></div>
+    <div id="loopZone"></div>
+
+    <div id="abMarkers">
+      <div id="markA" class="marker" style="display:none;">A</div>
+      <div id="markB" class="marker" style="display:none;">B</div>
+    </div>
+  </div>
+
+  <div class="chapter-box">
+    <div class="chapter-title">Repetitie nummer / cijfer</div>
+    <div id="chapters" class="chapter-list"></div>
+  </div>
+
+  <div class="controls-row">
+    <button onclick="togglePlay()" id="playBtn">▶ Play</button>
+    <button onclick="setA()" id="btnA">A -</button>
+    <button onclick="setB()" id="btnB">B -</button>
+  </div>
+
+  <div class="speed">
+    <div class="speed-header">
+      <span>Snelheid</span>
+      <div class="speed-controls-info">
+        <span id="speedVal">100%</span>
+        <button class="btn-reset" onclick="resetSpeed()">↺ Reset</button>
+      </div>
+    </div>
+    <input id="speedSlider" type="range" min="50" max="200" value="100" oninput="setSpeed(this.value)">
+  </div>
+
+  <div id="list" class="playlist-container"></div>
+</div>
+
+<script>
+const tracks=[
+  { name: "Bailando la soca", file: "Bailando.mp3" },
+  { name: "Blinding Lights", file: "Blinding.mp3" },
+  { name: "Conga", file: "Conga.mp3",
+    chapters: [
+      {time:16,label:"A"},{time:32,label:"B"},{time:47,label:"C"},
+      {time:78,label:"D"},{time:101,label:"E"},{time:117,label:"F"},
+      {time:132,label:"G"},{time:148,label:"H"},{time:155,label:"I"},
+    ]
+  },
+{ name: "Lingus (Snarky + Chris Potter solo", file: "Lingus.mp3",},
+
+  { name: "Moving sounds", file: "Moving.mp3",
+    chapters: [
+      {time:33,label:"19"},{time:52,label:"29"},{time:66,label:"37"},
+      {time:110,label:"61"},{time:124,label:"69"},{time:135,label:"75"},
+      {time:164,label:"91"},{time:186,label:"103"},{time:193,label:"107"},
+      {time:214,label:"119"},{time:240,label:"127"},
+    ]
+  },
+  { name: "Rush hour samba", file: "Rush.mp3",
+    chapters: [
+      {time:30,label:"C"},{time:62,label:"E"},{time:85,label:"F"},
+      {time:103,label:"G"},{time:186,label:"Segno"},{time:234,label:"Coda"},
+    ]
+  },
+  { name: "Shift", file: "Shift.mp3",
+    chapters: [
+      {time:32,label:"18"},{time:51,label:"36"},{time:78,label:"50"},
+      {time:134,label:"89"},{time:149,label:"97"},{time:186,label:"116"},
+    ]
+  },
+  { name: "Smoothavana", file: "Smoothavana.mp3",
+    chapters: [
+      {time:51,label:"25"},{time:89,label:"43"},{time:144,label:"67"},
+      {time:162,label:"75"},{time:198,label:"91"},{time:268,label:"125"},
+    ]
+  },
+{ name: "Starmachine 2000", file: "Starmachine.mp3",
+]
+{ name: "Star wars 2.0", file: "Star.mp3",
+    chapters: [
+      {time:74,label:"32"},{time:96,label:"43"},{time:234,label:"98"},
+      {time:303,label:"118"},{time:354,label:"168"},
+]
+  },
+{ name: "The Planets, Mars", file: "Mars.mp3",
+    ]
+  },
+
+  { name: "Trinity (snarky versie)", file: "Trinity.mp3",
+    chapters: [
+      {time:30,label:"B"},{time:95,label:"F"},{time:157,label:"G"},
+      {time:182,label:"H"},{time:213,label:"J"},{time:258,label:"K"},
+      {time:322,label:"L"},
+    ]
+  },
+  { name: "Walk like an Egyptian", file: "Walk.mp3",
+    chapters: [
+      {time:58,label:"B"},{time:67,label:"C"},{time:93,label:"D"},
+      {time:118,label:"E"},{time:128,label:"Segno"},{time:164,label:"Coda"},
+    ]
+  },
+  { name: "Windows of the maloca", file: "Windows.mp3",
+    chapters: [
+      {time:32,label:"A"},{time:48,label:"B"},{time:80,label:"C"},
+      {time:130,label:"D"},{time:162,label:"E"},{time:210,label:"F"},
+      {time:235,label:"G"},{time:260,label:"H"},{time:276,label:"I"},
+      {time:292,label:"J"},
+    ]
+  },
+];
+
+let current=0;
+let loopA=null, loopB=null;
+let chapterElements=[];
+
+const wavesurfer=WaveSurfer.create({
+  container:"#waveform",
+  waveColor:"#4b5563",
+  progressColor:"#3b82f6",
+  height:80,
+  normalize:true,
+  cursorColor:"#f0f6fc",
+  cursorWidth: 2
+});
+
+/* playlist */
+const list=document.getElementById("list");
+
+tracks.forEach((t,i)=>{
+  const div=document.createElement("div");
+  div.className="track";
+  div.innerHTML=`<span>🎵 ${t.name}</span>`;
+  div.onclick=()=>loadTrack(i);
+  list.appendChild(div);
+});
+
+function updatePlaylist(){
+  document.querySelectorAll(".track").forEach((el,i)=>{
+    el.classList.toggle("active",i===current);
+  });
+}
+
+/* chapters */
+function renderChapters(){
+  const container=document.getElementById("chapters");
+  container.innerHTML="";
+  chapterElements=[];
+
+  const chapters = tracks[current].chapters || [];
+
+  if(chapters.length === 0){
+    container.innerHTML="<div style='opacity:0.4; font-size: 0.85rem;'>Geen markeringen beschikbaar</div>";
+    return;
+  }
+
+  chapters.forEach(ch=>{
+    const el=document.createElement("div");
+    el.className="chapter";
+    el.innerText=ch.label;
+    el.onclick=()=>wavesurfer.setTime(ch.time);
+
+    container.appendChild(el);
+    chapterElements.push(el);
+  });
+}
+
+function updateActiveChapter(time){
+  const chapters = tracks[current].chapters || [];
+  let activeIndex = -1;
+
+  for(let i=0;i<chapters.length;i++){
+    if(time >= chapters[i].time){
+      activeIndex = i;
+    } else break;
+  }
+
+  chapterElements.forEach((el,i)=>{
+    el.classList.toggle("active", i===activeIndex);
+  });
+}
+
+/* LOOP FUNCTIES */
+function resetLoop(){
+  loopA=null;
+  loopB=null;
+
+  markA.style.display="none";
+  markB.style.display="none";
+  loopZone.style.display="none";
+
+  updateButtons();
+  updateVisuals();
+}
+
+function updateButtons(){
+  btnA.innerText = "A " + (loopA ? format(loopA) : "-");
+  btnB.innerText = "B " + (loopB ? format(loopB) : "-");
+}
+
+function updateVisuals(){
+  const dur = wavesurfer.getDuration();
+  if(!dur) return;
+
+  let a = loopA;
+  let b = loopB;
+
+  if(a && b && a > b) [a,b] = [b,a];
+
+  if(a != null){
+    markA.style.display="block";
+    markA.style.left=(a/dur*100)+"%";
+  } else markA.style.display="none";
+
+  if(b != null){
+    markB.style.display="block";
+    markB.style.left=(b/dur*100)+"%";
+  } else markB.style.display="none";
+
+  if(a != null && b != null){
+    loopZone.style.display="block";
+    loopZone.style.left=(a/dur*100)+"%";
+    loopZone.style.width=((b-a)/dur*100)+"%";
+  } else {
+    loopZone.style.display="none";
+  }
+}
+
+function setA(){
+  loopA = (loopA !== null) ? null : wavesurfer.getCurrentTime();
+  updateButtons();
+  updateVisuals();
+}
+
+function setB(){
+  loopB = (loopB !== null) ? null : wavesurfer.getCurrentTime();
+  updateButtons();
+  updateVisuals();
+}
+
+/* load */
+function loadTrack(i){
+  current=i;
+  wavesurfer.load(tracks[i].file);
+
+  updatePlaylist();
+
+  resetSpeed();
+
+  resetLoop();
+
+  wavesurfer.once("ready",()=>{
+    wavesurfer.play();
+    playBtn.innerText="⏸ Pause";
+    totalTime.innerText=format(wavesurfer.getDuration());
+    renderChapters();
+  });
+}
+
+function togglePlay(){
+  wavesurfer.playPause();
+  playBtn.innerText = wavesurfer.isPlaying() ? "⏸ Pause" : "▶ Play";
+}
+
+function setSpeed(val){
+  wavesurfer.setPlaybackRate(val/100);
+  speedVal.innerText = val + "%";
+}
+
+function resetSpeed(){
+  setSpeed(100);
+  document.getElementById("speedSlider").value = 100;
+}
+
+wavesurfer.on("audioprocess",()=>{
+  const time = wavesurfer.getCurrentTime();
+  currentTime.innerText = format(time);
+
+  updateActiveChapter(time);
+
+  if(loopA!=null && loopB!=null){
+    let a = loopA, b = loopB;
+    if(a > b) [a,b] = [b,a];
+
+    if(time >= b){
+      wavesurfer.setTime(a);
+    }
+  }
+});
+
+function format(t){
+  const m=Math.floor(t/60);
+  const s=Math.floor(t%60);
+  return m+":"+s.toString().padStart(2,'0');
+}
+
+/* init */
+loadTrack(0);
+</script>
+
+</body>
+</html>
