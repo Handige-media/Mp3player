@@ -8,144 +8,283 @@
 <script src="https://unpkg.com/wavesurfer.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#0b0f19;
-  color:white;
-  display:flex;
-  justify-content:center;
-  padding:20px;
+:root {
+  --bg-color: #0d1117;
+  --card-bg: #161b22;
+  --panel-bg: #21262d;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --green: #22c55e;
+  --red: #ef4444;
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --border: #30363d;
 }
 
-.box{
-  width:100%;
-  max-width:420px;
-  background:#151c2e;
-  padding:15px;
-  border-radius:16px;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-h2{text-align:center;}
-
-.timebar{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  opacity:0.8;
-  margin-bottom:6px;
+.box {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
-.wave-wrap{
-  position:relative;
-  padding:10px 0;
+h2 {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
-#waveform{
-  border-radius:10px;
-  overflow:hidden;
+.timebar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
 }
 
-#loopZone{
-  position:absolute;
-  top:0;
-  height:80px;
-  background:rgba(43,111,255,0.25);
-  display:none;
-  z-index:1;
+.wave-wrap {
+  position: relative;
+  padding: 8px 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-#abMarkers .marker{
-  position:absolute;
-  transform:translateX(-50%);
-  bottom:-5px;
-  font-size:11px;
-  padding:4px 6px;
-  border-radius:6px;
-  cursor:pointer;
-  z-index:10;
+#waveform {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-#markA{background:#16a34a;}
-#markB{background:#dc2626;}
-
-.chapter-box{
-  margin-top:12px;
-  background:#1f2a44;
-  border-radius:10px;
-  padding:10px;
+#loopZone {
+  position: absolute;
+  top: 8px;
+  height: 80px;
+  background: rgba(59, 130, 246, 0.25);
+  border-left: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  display: none;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.chapter-title{
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:8px;
+#abMarkers .marker {
+  position: absolute;
+  transform: translateX(-50%);
+  bottom: 0px;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-.chapter-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
+#markA { background: var(--green); color: white; }
+#markB { background: var(--red); color: white; }
+
+.chapter-box {
+  margin-top: 16px;
+  background: var(--panel-bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
 }
 
-.chapter{
-  background:#2b6fff;
-  padding:6px 10px;
-  border-radius:8px;
-  font-size:12px;
-  cursor:pointer;
-  font-weight:700;
-  transition:0.2s;
+.chapter-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
 }
 
-.chapter.active{
-  background:#16a34a;
-  transform:scale(1.1);
+.chapter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.controls-row{
-  display:flex;
-  gap:6px;
-  margin-top:10px;
+.chapter {
+  background: #30363d;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  user-select: none;
 }
 
-.controls-row button{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#24304f;
-  color:white;
-  cursor:pointer;
+.chapter:hover {
+  background: #3c444d;
 }
 
-.speed{
-  margin-top:12px;
+.chapter.active {
+  background: var(--green);
+  color: white;
+  transform: translateY(-1px);
 }
 
-.speed-header{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:6px;
+.controls-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
 }
 
-#speedVal{
-  width:70px;
-  text-align:right;
+.controls-row button {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.speed input{width:100%;}
-
-.track{
-  padding:10px;
-  margin-top:6px;
-  background:#1f2a44;
-  border-radius:8px;
-  cursor:pointer;
+.controls-row button:hover {
+  background: #2d333b;
+  border-color: #444c56;
 }
 
-.track.active{
-  background:#2b6fff;
+.controls-row button:active {
+  transform: scale(0.98);
+}
+
+#playBtn {
+  background: var(--accent);
+  border-color: var(--accent);
+  flex: 1.2;
+}
+
+#playBtn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.speed {
+  margin-top: 16px;
+  background: var(--panel-bg);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.speed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.speed-controls-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#speedVal {
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  min-width: 42px;
+  text-align: right;
+}
+
+.btn-reset {
+  background: #30363d;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.btn-reset:hover {
+  background: #3c444d;
+}
+
+.speed input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.playlist-container {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+.playlist-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.track {
+  padding: 12px 14px;
+  background: var(--panel-bg);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.track:hover {
+  border-color: var(--border);
+  background: #282e36;
+}
+
+.track.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
 }
 </style>
 </head>
@@ -156,8 +295,8 @@ h2{text-align:center;}
   <h2>🎧 MP3 Player</h2>
 
   <div class="timebar">
-    <div id="currentTime">0:00</div>
-    <div id="totalTime">0:00</div>
+    <span id="currentTime">0:00</span>
+    <span id="totalTime">0:00</span>
   </div>
 
   <div class="wave-wrap">
@@ -171,12 +310,12 @@ h2{text-align:center;}
   </div>
 
   <div class="chapter-box">
-    <div class="chapter-title">Repetitie nummer/cijfer</div>
+    <div class="chapter-title">Repetitie nummer / cijfer</div>
     <div id="chapters" class="chapter-list"></div>
   </div>
 
   <div class="controls-row">
-    <button onclick="togglePlay()" id="playBtn">Play</button>
+    <button onclick="togglePlay()" id="playBtn">▶ Play</button>
     <button onclick="setA()" id="btnA">A -</button>
     <button onclick="setB()" id="btnB">B -</button>
   </div>
@@ -184,13 +323,15 @@ h2{text-align:center;}
   <div class="speed">
     <div class="speed-header">
       <span>Snelheid</span>
-      <span id="speedVal">100%</span>
+      <div class="speed-controls-info">
+        <span id="speedVal">100%</span>
+        <button class="btn-reset" onclick="resetSpeed()">↺ Reset</button>
+      </div>
     </div>
-    <input id="speedSlider" type="range" min="50" max="200" value="100"
-      oninput="setSpeed(this.value)">
+    <input id="speedSlider" type="range" min="50" max="200" value="100" oninput="setSpeed(this.value)">
   </div>
 
-  <div id="list"></div>
+  <div id="list" class="playlist-container"></div>
 </div>
 
 <script>
@@ -204,6 +345,8 @@ const tracks=[
       {time:132,label:"G"},{time:148,label:"H"},{time:155,label:"I"},
     ]
   },
+{ name: "Lingus (Snarky + Chris Potter solo", file: "Lingus.mp3",},
+
   { name: "Moving sounds", file: "Moving.mp3",
     chapters: [
       {time:33,label:"19"},{time:52,label:"29"},{time:66,label:"37"},
@@ -230,6 +373,18 @@ const tracks=[
       {time:162,label:"75"},{time:198,label:"91"},{time:268,label:"125"},
     ]
   },
+{ name: "Starmachine 2000", file: "Starmachine.mp3",
+]
+{ name: "Star wars 2.0", file: "Star.mp3",
+    chapters: [
+      {time:74,label:"32"},{time:96,label:"43"},{time:234,label:"98"},
+      {time:303,label:"118"},{time:354,label:"168"},
+]
+  },
+{ name: "The Planets, Mars", file: "Mars.mp3",
+    ]
+  },
+
   { name: "Trinity (snarky versie)", file: "Trinity.mp3",
     chapters: [
       {time:30,label:"B"},{time:95,label:"F"},{time:157,label:"G"},
@@ -259,10 +414,12 @@ let chapterElements=[];
 
 const wavesurfer=WaveSurfer.create({
   container:"#waveform",
-  waveColor:"#4f7cff",
-  progressColor:"#2b6fff",
+  waveColor:"#4b5563",
+  progressColor:"#3b82f6",
   height:80,
-  normalize:true
+  normalize:true,
+  cursorColor:"#f0f6fc",
+  cursorWidth: 2
 });
 
 /* playlist */
@@ -271,7 +428,7 @@ const list=document.getElementById("list");
 tracks.forEach((t,i)=>{
   const div=document.createElement("div");
   div.className="track";
-  div.innerText=t.name;
+  div.innerHTML=`<span>🎵 ${t.name}</span>`;
   div.onclick=()=>loadTrack(i);
   list.appendChild(div);
 });
@@ -291,7 +448,7 @@ function renderChapters(){
   const chapters = tracks[current].chapters || [];
 
   if(chapters.length === 0){
-    container.innerHTML="<div style='opacity:0.5'>-</div>";
+    container.innerHTML="<div style='opacity:0.4; font-size: 0.85rem;'>Geen markeringen beschikbaar</div>";
     return;
   }
 
@@ -386,14 +543,13 @@ function loadTrack(i){
 
   updatePlaylist();
 
-  setSpeed(100);
-  document.getElementById("speedSlider").value = 100;
+  resetSpeed();
 
   resetLoop();
 
   wavesurfer.once("ready",()=>{
     wavesurfer.play();
-    playBtn.innerText="Pause";
+    playBtn.innerText="⏸ Pause";
     totalTime.innerText=format(wavesurfer.getDuration());
     renderChapters();
   });
@@ -401,12 +557,17 @@ function loadTrack(i){
 
 function togglePlay(){
   wavesurfer.playPause();
-  playBtn.innerText = wavesurfer.isPlaying() ? "Pause" : "Play";
+  playBtn.innerText = wavesurfer.isPlaying() ? "⏸ Pause" : "▶ Play";
 }
 
 function setSpeed(val){
   wavesurfer.setPlaybackRate(val/100);
   speedVal.innerText = val + "%";
+}
+
+function resetSpeed(){
+  setSpeed(100);
+  document.getElementById("speedSlider").value = 100;
 }
 
 wavesurfer.on("audioprocess",()=>{
